@@ -28,7 +28,7 @@ preferences {
   }
   
   section("Make sure it's closed"){
-    input "contact", "capability.contactSensor", title: "Which contact sensor?", required: true
+    input "contacts", "capability.contactSensor", title: "Which contact sensor?", multiple: true, required: true
   }
   section( "Notifications" ) {
     input "sendPushMessage", "enum", title: "Send a push notification?", metadata:[values:["Yes", "No"]], required: false
@@ -46,20 +46,22 @@ def updated(settings) {
 }
 
 def setTimeCallback() {
-  if (contact) {
+  if (contacts) {
     doorOpenCheck()
   }
 }
 def doorOpenCheck() {
-  def currentState = contact.contactState
-  if (currentState?.value == "open") {
-    def msg = "${contact.displayName} is open."
-    log.info msg
-    if (sendPushMessage) {
-      sendPush msg
+    contacts.each() {
+        def currentState = it.contactState
+        if (currentState?.value == "open") {
+            def msg = "${it.displayName} is open."
+            log.info msg
+            if (sendPushMessage) {
+                sendPush msg
+            }
+            if (phone) {
+                sendSms phone, msg
+            }
+        }
     }
-    if (phone) {
-      sendSms phone, msg
-    }
-  }
 }
