@@ -26,10 +26,11 @@ preferences {
   section("At this time every day") {
     input "time", "time", title: "Time of Day"
   }
-  
-  section("Make sure it's closed"){
+
+  section("Make sure it's closed") {
     input "contacts", "capability.contactSensor", title: "Which contact sensor?", multiple: true, required: true
   }
+
   section( "Notifications" ) {
     input "sendPushMessage", "enum", title: "Send a push notification?", metadata:[values:["Yes", "No"]], required: false
     input "phone", "phone", title: "Send a text message?", required: false
@@ -50,18 +51,19 @@ def setTimeCallback() {
     doorOpenCheck()
   }
 }
+
 def doorOpenCheck() {
-    contacts.each() {
-        def currentState = it.contactState
-        if (currentState?.value == "open") {
-            def msg = "${it.displayName} is open."
-            log.info msg
-            if (sendPushMessage) {
-                sendPush msg
-            }
-            if (phone) {
-                sendSms phone, msg
-            }
-        }
+  contacts.each() {
+    def currentState = it.contactState
+    if (currentState?.value == "open") {
+      def msg = "${it.displayName} is open."
+      log.info msg
+      if (sendPushMessage) {
+        sendPush msg
+      }
+      if (phone) {
+        sendSms phone, msg
+      }
     }
+  }
 }
